@@ -12,6 +12,11 @@ if TYPE_CHECKING:
     from llmtuner.hparams import DataArguments
 
 
+def save_query_info(query, token_length, filename="/workspace/query_info.txt"):
+    with open(filename, "a") as f:  # 使用'a'模式，这样每次调用函数时都会在文件末尾添加新的信息，而不是覆盖原有内容。
+        f.write(f"Query: {query}\n")
+        f.write(f"Token Length: {token_length}\n\n")  # 记录token的长度
+
 def preprocess_dataset(
     dataset: Union["Dataset", "IterableDataset"],
     tokenizer: "PreTrainedTokenizer",
@@ -65,13 +70,16 @@ def preprocess_dataset(
 
             for source_ids, target_ids in template.encode_multiturn(tokenizer, query, response, history, system):
                 if len(source_ids) > data_args.max_source_length:
+                    save_query_info(query, len(source_ids))
                     exit(141)
                     source_ids = source_ids[:data_args.max_source_length]
                 if len(target_ids) > data_args.max_target_length:
+                    save_query_info(query, len(source_ids))
                     exit(141)
                     target_ids = target_ids[:data_args.max_target_length]
 
                 if len(input_ids) + len(source_ids) + len(target_ids) > max_length:
+                    save_query_info(query, len(source_ids))
                     exit(141)
                     break
 
@@ -92,9 +100,11 @@ def preprocess_dataset(
             source_ids, target_ids = template.encode_oneturn(tokenizer, query, response, history, system)
 
             if len(source_ids) > data_args.max_source_length:
+                save_query_info(query, len(source_ids))
                 exit(141)
                 source_ids = source_ids[:data_args.max_source_length]
             if len(target_ids) > data_args.max_target_length:
+                save_query_info(query, len(source_ids))
                 exit(141)
                 target_ids = target_ids[:data_args.max_target_length]
 
@@ -112,12 +122,15 @@ def preprocess_dataset(
             _, rejected_ids = template.encode_oneturn(tokenizer, query, response[1], history, system)
 
             if len(prompt_ids) > data_args.max_source_length:
+                save_query_info(query, len(source_ids))
                 exit(141)
                 prompt_ids = prompt_ids[:data_args.max_source_length]
             if len(chosen_ids) > data_args.max_target_length:
+                save_query_info(query, len(source_ids))
                 exit(141)
                 chosen_ids = chosen_ids[:data_args.max_target_length]
             if len(rejected_ids) > data_args.max_target_length:
+                save_query_info(query, len(source_ids))
                 exit(141)
                 rejected_ids = rejected_ids[:data_args.max_target_length]
 
