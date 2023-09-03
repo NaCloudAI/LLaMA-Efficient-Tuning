@@ -74,12 +74,10 @@ def preprocess_dataset(
                     exit(141)
                     source_ids = source_ids[:data_args.max_source_length]
                 if len(target_ids) > data_args.max_target_length:
-                    save_query_info(query, len(source_ids))
-                    exit(141)
                     target_ids = target_ids[:data_args.max_target_length]
 
                 if len(input_ids) + len(source_ids) + len(target_ids) > max_length:
-                    save_query_info(query, len(source_ids))
+                    save_query_info('BOTH', len(source_ids))
                     exit(141)
                     break
 
@@ -104,8 +102,6 @@ def preprocess_dataset(
                 exit(141)
                 source_ids = source_ids[:data_args.max_source_length]
             if len(target_ids) > data_args.max_target_length:
-                save_query_info(query, len(source_ids))
-                exit(141)
                 target_ids = target_ids[:data_args.max_target_length]
 
             model_inputs["input_ids"].append(source_ids)
@@ -126,11 +122,9 @@ def preprocess_dataset(
                 exit(141)
                 prompt_ids = prompt_ids[:data_args.max_source_length]
             if len(chosen_ids) > data_args.max_target_length:
-                save_query_info(query, len(source_ids))
-                exit(141)
                 chosen_ids = chosen_ids[:data_args.max_target_length]
             if len(rejected_ids) > data_args.max_target_length:
-                save_query_info(query, len(source_ids))
+                save_query_info('BOTH', len(source_ids))
                 exit(141)
                 rejected_ids = rejected_ids[:data_args.max_target_length]
 
